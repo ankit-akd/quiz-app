@@ -102,13 +102,14 @@ function MainQuiz() {
       <div className="result">
         <h3>Quiz Over!! Your Final score is {score} points</h3>
         <div>
-          <h4>Quiz Report</h4>
+          <h4>Quiz Report:</h4>
           <ul>
             {userResponses.map((item, index) => (
               <li key={index}>
                 <strong>Question:</strong> {item.question}<br />
                 <strong>Your Answer:</strong> {item.userAnswer}<br />
-                <strong>Correct Answer:</strong> {item.correctAnswer}
+                <strong>Correct Answer:</strong> {item.correctAnswer}<br />
+                <br></br>
               </li>
             ))}
           </ul>
@@ -121,7 +122,7 @@ function MainQuiz() {
         <div>
           <span>Time Left: {timer} seconds</span>
           <div>
-            <strong>Question Overview:</strong>
+            <strong style={{float:'left'}}>Question Overview:</strong>
             <ul className="question-list">
               {questions.map((question, index) => (
                 <li key={index}>
