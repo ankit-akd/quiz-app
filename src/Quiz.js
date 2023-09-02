@@ -90,6 +90,12 @@ function MainQuiz() {
     setUserResponses(userResponsesData);
   };
 
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds}s`;
+  };
+
   if (loading) {
     return <div>Loading questions...</div>;
   }
@@ -120,7 +126,7 @@ function MainQuiz() {
     return (
       <div className="App">
         <div>
-          <span>Time Left: {timer} seconds</span>
+          <span>Time Left: {formatTime(timer)}</span>
           <div>
             <strong style={{float:'left'}}>Question Overview:</strong>
             <ul className="question-list">
