@@ -11,7 +11,7 @@ function MainQuiz() {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userResponses, setUserResponses] = useState([]);
-  const [timer, setTimer] = useState(30*60); 
+  const [timer, setTimer] = useState(30*60);
   const [visitedQuestions, setVisitedQuestions] = useState([]);
   const [attemptedQuestions, setAttemptedQuestions] = useState([]);
 
@@ -27,7 +27,7 @@ function MainQuiz() {
 
       return () => clearInterval(timerInterval);
     } else if (timer === 0 && !isEnd) {
-        finishHandler();
+      finishHandler();
     }
   }, [timer, isEnd]);
 
@@ -39,8 +39,12 @@ function MainQuiz() {
       const quizData = response.data.results;
       if (quizData.length > 0) {
         setQuestions(quizData);
-        setOptions([...quizData[0].incorrect_answers, quizData[0].correct_answer]);
+        setOptions([
+          ...quizData[0].incorrect_answers,
+          quizData[0].correct_answer,
+        ]);
         setLoading(false);
+        setUserResponses(Array(quizData.length).fill(null)); 
       }
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -53,10 +57,12 @@ function MainQuiz() {
     }
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setOptions([...questions[currentQuestion + 1].incorrect_answers, questions[currentQuestion + 1].correct_answer]);
+      setOptions([
+        ...questions[currentQuestion + 1].incorrect_answers,
+        questions[currentQuestion + 1].correct_answer,
+      ]);
       setMyAnswer(null);
       setDisabled(true);
-      
       setVisitedQuestions([...visitedQuestions, currentQuestion]);
     } else {
       setIsEnd(true);
@@ -66,8 +72,10 @@ function MainQuiz() {
   const goToQuestion = (questionIndex) => {
     if (questionIndex >= 0 && questionIndex < questions.length) {
       setCurrentQuestion(questionIndex);
-      setOptions([...questions[questionIndex].incorrect_answers, questions[questionIndex].correct_answer]);
-      
+      setOptions([
+        ...questions[questionIndex].incorrect_answers,
+        questions[questionIndex].correct_answer,
+      ]);
       setVisitedQuestions([...visitedQuestions, questionIndex]);
     }
   };
@@ -75,19 +83,16 @@ function MainQuiz() {
   const checkAnswer = (answer) => {
     setMyAnswer(answer);
     setDisabled(false);
-    
+
+    const updatedUserResponses = [...userResponses];
+    updatedUserResponses[currentQuestion] = answer;
+    setUserResponses(updatedUserResponses);
+
     setAttemptedQuestions([...attemptedQuestions, currentQuestion]);
   };
 
   const finishHandler = () => {
     setIsEnd(true);
-    
-    const userResponsesData = questions.map((question, index) => ({
-      question: question.question,
-      userAnswer: userResponses[index],
-      correctAnswer: question.correct_answer,
-    }));
-    setUserResponses(userResponsesData);
   };
 
   const formatTime = (seconds) => {
@@ -100,8 +105,10 @@ function MainQuiz() {
     return <div>Loading questions...</div>;
   }
 
-  const isQuestionVisited = (questionIndex) => visitedQuestions.includes(questionIndex);
-  const isQuestionAttempted = (questionIndex) => attemptedQuestions.includes(questionIndex);
+  const isQuestionVisited = (questionIndex) =>
+    visitedQuestions.includes(questionIndex);
+  const isQuestionAttempted = (questionIndex) =>
+    attemptedQuestions.includes(questionIndex);
 
   if (isEnd) {
     return (
@@ -110,11 +117,11 @@ function MainQuiz() {
         <div>
           <h4>Quiz Report:</h4>
           <ul>
-            {userResponses.map((item, index) => (
+            {questions.map((item, index) => (
               <li key={index}>
                 <strong>Question:</strong> {item.question}<br />
-                <strong>Your Answer:</strong> {item.userAnswer}<br />
-                <strong>Correct Answer:</strong> {item.correctAnswer}<br />
+                <strong>Your Answer:</strong> {userResponses[index]}<br />
+                <strong>Correct Answer:</strong> {item.correct_answer}<br />
                 <br></br>
               </li>
             ))}
@@ -128,7 +135,7 @@ function MainQuiz() {
         <div>
           <span>Time Left: {formatTime(timer)}</span>
           <div>
-            <strong style={{float:'left'}}>Question Overview:</strong>
+            <strong style={{ float: "left" }}>Question Overview:</strong>
             <ul className="question-list">
               {questions.map((question, index) => (
                 <li key={index}>
